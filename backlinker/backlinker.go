@@ -172,13 +172,13 @@ func extractFrontmatter(file *markdownFile, scanner *bufio.Scanner) error {
 		line = scanner.Text()
 		if first {
 			first = false
-			if line != "+++" {
+			if line != "---" {
 				noMeta = true
 				break
 			}
 			continue
 		}
-		if line == "+++" {
+		if line == "---" {
 			foundEnd = true
 			break
 		}
@@ -257,9 +257,9 @@ func adjustFrontmatter(file *markdownFile, writer io.Writer) error {
 	if err != nil {
 		return err
 	}
-	writer.Write([]byte("+++\n"))
+	writer.Write([]byte("---\n"))
 	writer.Write(updatedMeta)
-	writer.Write([]byte("+++\n"))
+	writer.Write([]byte("---\n"))
 
 	return nil
 }
@@ -276,7 +276,7 @@ func createHugoLink(filename string) string {
 	name := removeExtension(filename)
 	name = strings.ToLower(name)
 	name = strings.ReplaceAll(name, " ", "-")
-	return "../" + name + "/"
+	return "./" + name + "/"
 }
 
 // convertLinksOnLine does a simple regex-based replacement of wikilinks on a single line
