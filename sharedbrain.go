@@ -3,7 +3,8 @@ package main
 import (
 	"flag"
 	"log"
-	"sharedbrain/backlinker"
+
+	"github.com/sheldonhull/sharedbrain/backlinker"
 )
 
 const VERSION = "1.1.2"
