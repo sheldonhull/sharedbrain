@@ -3,7 +3,7 @@
 version: '3'
 vars:
   ARTIFACT_DIRECTORY: ./artifacts
-
+  LOCAL_DIRECTORY: "{{ .HOME }}/git/sheldonhull/sheldonhull.hugo/content/posts/2021"
 tasks:
   default:
     cmds:
@@ -20,14 +20,14 @@ tasks:
     desc: build app
     cmds:
       - |
-        rm ./artifacts/backlinker
-        go build -o ./artifacts/backlinker
+        rm ./artifacts/sharedbrain
+        go build -o ./artifacts/sharedbrain
   test:
     desc: run go tests
     cmds:
       - task: build
       - |
-        go test -v
+        go test -v ./backlinker
   coverage:
     desc: add code coverage metrics
     cmds:
@@ -36,3 +36,9 @@ tasks:
         go test ./backlinker/ -coverprofile ./artifacts/cover.out
         go tool cover -html=./artifacts/cover.out -o ./artifacts/coverage.html
         gopherbadger -md="README.md,coverage.md" -tags 'unit' # -manualcov=95
+  localrun:
+      desc: run tool locally against specific blog directory
+      cmds:
+        - task: build
+        - |
+          {{ .ARTIFACT_DIRECTORY }}/sharedbrain  -content {{ .LOCAL_DIRECTORY }} -dest {{ .LOCAL_DIRECTORY }}

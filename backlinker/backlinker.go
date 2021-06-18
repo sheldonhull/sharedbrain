@@ -17,11 +17,11 @@ import (
 
 	wikilinks "github.com/dangoor/goldmark-wikilinks"
 	// "github.com/naoina/toml"
-	        "gopkg.in/yaml.v2"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/text"
 	"github.com/yuin/goldmark/util"
+	"gopkg.in/yaml.v2"
 )
 
 // backlink is a link to a given markdownFile from another
@@ -213,16 +213,15 @@ func extractFrontmatter(file *markdownFile, scanner *bufio.Scanner) error {
 // the frontmatter.
 func adjustFrontmatter(file *markdownFile, writer io.Writer) error {
 	meta := file.metadata
-
+	plainFilename := removeExtension(file.OriginalName)
 	if file.IsDateFile {
 		_, hasTitle := meta["title"]
-		plainFilename := removeExtension(file.OriginalName)
-		if !hasTitle {
+			if !hasTitle {
 			meta["title"] = plainFilename
 		}
 		_, hasDate := meta["date"]
 		if !hasDate {
-			datetime, err := time.Parse(time.RFC3339, plainFilename+"T08:00:00Z")
+			datetime, err := time.Parse(time.RFC3339, plainFilename+"T08:00:00-05:00")
 			if err != nil {
 				return err
 			}
@@ -244,7 +243,10 @@ func adjustFrontmatter(file *markdownFile, writer io.Writer) error {
 			if !hasDate {
 				continue
 			}
-			otherDate := otherDateInt.(time.Time)
+			otherDate, ok := otherDateInt.(time.Time)
+			if ok == false {
+				log.Printf("[time.Parse] probable invalid date format %s", plainFilename)
+			}
 			if otherDate.After(latest) {
 				latest = otherDate
 			}
