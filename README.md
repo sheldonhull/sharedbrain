@@ -1,11 +1,11 @@
 # sharedbrain
 
-sharedbrain is a simple pre-processor for Hugo markdown files. I was
-inspired by [Roam](https://roamresearch.com/), which presents backlinks for all
-of your notes and automatically generates pages for notes you haven't created yet.
-sharedbrain does something similar… you can take a directory edited with [nvALT](https://brettterpstra.com/projects/nvalt/),
-for example, and generate from that a set of posts ready to run through Hugo
-to generate a site.
+Originally written by
 
-It's certainly possible to share Roam notes directory, but I wanted a more "published" form,
-running on my own domain.
+## Code Coverage
+
+<a href='https://github.com/jpoles1/gopherbadger' target='_blank'>![gopherbadger-tag-do-not-edit](https://img.shields.io/badge/Go%20Coverage-58%25-brightgreen.svg?longCache=true&style=flat)</a>
+
+## License
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fsheldonhull%2Fsharedbrain.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fsheldonhull%2Fsharedbrain?ref=badge_large)

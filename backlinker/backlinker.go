@@ -16,7 +16,8 @@ import (
 	"time"
 
 	wikilinks "github.com/dangoor/goldmark-wikilinks"
-	"github.com/naoina/toml"
+	// "github.com/naoina/toml"
+	        "gopkg.in/yaml.v2"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/text"
@@ -193,7 +194,7 @@ func extractFrontmatter(file *markdownFile, scanner *bufio.Scanner) error {
 	}
 	meta := make(map[string]interface{})
 	if !noMeta {
-		err = toml.Unmarshal(front.Bytes(), meta)
+		err = yaml.Unmarshal(front.Bytes(), meta)
 		if err != nil {
 			return err
 		}
@@ -206,7 +207,7 @@ func extractFrontmatter(file *markdownFile, scanner *bufio.Scanner) error {
 	return nil
 }
 
-// adjustFrontmatter will parse the frontmatter block (if present) and gather the TOML
+// adjustFrontmatter will parse the frontmatter block (if present) and gather the YAML
 // metadata. It pulls out the title and applies it to the *markdownFile.
 // If the file being processed has a filename that's just a date, that date is inserted into
 // the frontmatter.
@@ -253,7 +254,7 @@ func adjustFrontmatter(file *markdownFile, writer io.Writer) error {
 		}
 	}
 
-	updatedMeta, err := toml.Marshal(meta)
+	updatedMeta, err := yaml.Marshal(meta)
 	if err != nil {
 		return err
 	}
@@ -360,8 +361,8 @@ func addBacklinks(file *markdownFile, fileMap map[string]*markdownFile, writer i
 		title := backlink.OtherFile.Title
 		link := createHugoLink(backlink.OtherFile.OriginalName)
 		context := convertLinksOnLine(backlink.Context, fileMap)
-		writer.Write([]byte(fmt.Sprintf(`* [%s](%s)
-    * %s
+		writer.Write([]byte(fmt.Sprintf(`- [%s](%s)
+    - %s
 `, title, link, context)))
 	}
 	return nil

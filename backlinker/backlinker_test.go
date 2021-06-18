@@ -38,11 +38,11 @@ func TestCollectBacklinksForFile(t *testing.T) {
 	}
 
 	collectBacklinksForFile(fileMap, fileMap["first.md"], []byte(`
-* This is a line with no links
-* This is a line [with a regular link](https://google.com)
-* This is a line with a link to [[second]]
-* This is another line with no links
-* This links to an [[Unknown]]
+- This is a line with no links
+- This is a line [with a regular link](https://google.com)
+- This is a line with a link to [[second]]
+- This is another line with no links
+- This links to an [[Unknown]]
 `))
 	second := fileMap["second.md"]
 	require.Equal(1, len(second.BackLinks))
@@ -75,10 +75,10 @@ func TestFrontmatterMayPassThroughUnchanged(t *testing.T) {
 		OriginalName: "AFile.md",
 		BackLinks:    nil,
 	}
-	inputText := `+++
-title = "There's Metadata"
-date = 2019-08-26T19:34:48-04:00
-+++
+	inputText := `---
+title: There's Metadata
+date: 2019-08-26T19:34:48-04:00
+---
 `
 	scanner := bufio.NewScanner(strings.NewReader(inputText))
 	writer := bytes.Buffer{}
@@ -88,9 +88,9 @@ date = 2019-08-26T19:34:48-04:00
 	require.Nil(err)
 	require.Equal("", file.firstLine)
 	output := writer.String()
-	require.Contains(output, "date = 2019-08-26T19:34:48")
-	require.Contains(output, "title = \"There's")
-	require.True(strings.HasPrefix(output, "+++\n"))
+	require.Contains(output, "2019-08-26T19:34:48-04:00")
+	require.Contains(output, "title: There's")
+	require.True(strings.HasPrefix(output, "---\n"))
 	require.Equal("There's Metadata", file.Title)
 }
 
@@ -110,9 +110,9 @@ func TestFrontmatterForDatePages(t *testing.T) {
 	require.Nil(err)
 	require.Equal("## This is an example", file.firstLine)
 	output := writer.String()
-	require.True(strings.HasPrefix(output, "+++\n"))
-	require.Contains(output, "date = 2020-04-19T08:00:00Z\n")
-	require.Contains(output, "title = \"2020-04-19\"\n")
+	require.True(strings.HasPrefix(output, "---\n"))
+	require.Contains(output, "date: 2020-04-19T08:00:00Z\n")
+	require.Contains(output, "title: \"2020-04-19\"\n")
 }
 
 func TestDateAddedBasedOnBacklinks(t *testing.T) {
@@ -133,8 +133,8 @@ func TestDateAddedBasedOnBacklinks(t *testing.T) {
 	err := adjustFrontmatter(file, &writer)
 	require.Nil(err)
 	output := writer.String()
-	require.True(strings.HasPrefix(output, "+++\n"))
-	require.Contains(output, "date = 2020-04-25T19:00:00Z\n")
+	require.True(strings.HasPrefix(output, "---\n"))
+	require.Contains(output, "date: 2020-04-25T19:00:00Z\n")
 }
 
 func TestNoDateAddedIfBacklinkHasNoDate(t *testing.T) {
@@ -149,7 +149,7 @@ func TestNoDateAddedIfBacklinkHasNoDate(t *testing.T) {
 	err := adjustFrontmatter(file, &writer)
 	require.Nil(err)
 	output := writer.String()
-	require.True(strings.HasPrefix(output, "+++\n"))
+	require.True(strings.HasPrefix(output, "---\n"))
 	require.NotContains(output, "date\n")
 }
 
@@ -159,10 +159,10 @@ func TestFrontmatterWithSimplifiedDate(t *testing.T) {
 		OriginalName: "AFile.md",
 		BackLinks:    nil,
 	}
-	inputText := `+++
-title = "There's Metadata"
-date = 2019-08-26
-+++
+	inputText := `---
+title: "There's Metadata"
+date: '2019-08-26'
+---
 `
 	scanner := bufio.NewScanner(strings.NewReader(inputText))
 	writer := bytes.Buffer{}
@@ -173,7 +173,7 @@ date = 2019-08-26
 	require.Nil(err)
 	require.Equal("", file.firstLine)
 	output := writer.String()
-	require.Contains(output, "date = 2019-08-26T00:00:00Z")
+	require.Contains(output, "date: \"2019-08-26\"")
 }
 
 func TestConvertLinksOnLine(t *testing.T) {
@@ -186,7 +186,7 @@ func TestConvertLinksOnLine(t *testing.T) {
 	}
 	line := "This line links to [[First]] and [[third]] and [[name with spaces]]."
 	result := convertLinksOnLine(line, fileMap)
-	require.Equal("This line links to [First](../first/) and [third](../third/) and [name with spaces](../name-with-spaces/).", result)
+	require.Equal("This line links to [First](./first/) and [third](./third/) and [name with spaces](./name-with-spaces/).", result)
 }
 
 func TestConvertLinksForUnknownFile(t *testing.T) {
@@ -196,7 +196,7 @@ func TestConvertLinksForUnknownFile(t *testing.T) {
 	}
 	line := "This line links to [[Unknown]]!"
 	result := convertLinksOnLine(line, fileMap)
-	require.Equal("This line links to [Unknown](../unknown/)!", result)
+	require.Equal("This line links to [Unknown](./unknown/)!", result)
 	unknown, exists := fileMap["unknown.md"]
 	require.True(exists, "Unknown file should have been created")
 	require.Equal("Unknown.md", unknown.OriginalName)
@@ -211,8 +211,8 @@ func TestConvertLinks(t *testing.T) {
 		"third.md":  {OriginalName: "Third.md", BackLinks: make([]backlink, 0)},
 	}
 	inputText := `## This is a heading
-* And here's a reference to [[Second]] and [[third]]
-* And another [[second]]
+- And here's a reference to [[Second]] and [[third]]
+- And another [[second]]
 `
 	scanner := bufio.NewScanner(strings.NewReader(inputText))
 	writer := bytes.Buffer{}
@@ -220,8 +220,8 @@ func TestConvertLinks(t *testing.T) {
 	require.Nil(err)
 	output := writer.String()
 	require.Equal(`## This is a heading
-* And here's a reference to [Second](../second/) and [third](../third/)
-* And another [second](../second/)
+- And here's a reference to [Second](./second/) and [third](./third/)
+- And another [second](./second/)
 `, output)
 }
 
@@ -282,8 +282,8 @@ func Test_addBacklinks(t *testing.T) {
 			wantWriter: `
 ## Backlinks
 
-* [Being The Second](../second/)
-    * This has a [first](../first/) link.
+- [Being The Second](./second/)
+    - This has a [first](./first/) link.
 `,
 			wantErr: false,
 		},
@@ -296,10 +296,10 @@ func Test_addBacklinks(t *testing.T) {
 			wantWriter: `
 ## Backlinks
 
-* [2020-04-24](../2020-04-24/)
-    * Also has a [third](../third/) link.
-* [2020-04-21](../2020-04-21/)
-    * This links to [Third](../third/).
+- [2020-04-24](./2020-04-24/)
+    - Also has a [third](./third/) link.
+- [2020-04-21](./2020-04-21/)
+    - This links to [Third](./third/).
 `,
 			wantErr: false,
 		},

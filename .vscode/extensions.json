@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        "golang.go-nightly",
+        "premparihar.gotestexplorer",
+        "hbenl.vscode-test-explorer",
+        "ethan-reesor.vscode-go-test-adapter",
+        "766b.go-outliner",
+        "romanpeshkov.go-test-outline",
+        "msyrus.go-doc",
+        "neverik.go-critic"
+    ]
+}

@@ -12,19 +12,27 @@ tasks:
   init:
     desc: initialize project tooling and directories
     cmds:
-    - |
-      mkdir -p {{ .ARTIFACT_DIRECTORY }}
-      chmod -R a+rwx ./artifacts
-      go mod tidy
+      - |
+        mkdir -p {{ .ARTIFACT_DIRECTORY }}
+        chmod -R a+rwx ./artifacts
+        go mod tidy
   build:
     desc: build app
     cmds:
-    - |
-      rm ./artifacts/backlinker
-      go build -o ./artifacts/backlinker
+      - |
+        rm ./artifacts/backlinker
+        go build -o ./artifacts/backlinker
   test:
     desc: run go tests
     cmds:
       - task: build
       - |
         go test -v
+  coverage:
+    desc: add code coverage metrics
+    cmds:
+      - |
+        go install github.com/jpoles1/gopherbadger@master
+        go test ./backlinker/ -coverprofile ./artifacts/cover.out
+        go tool cover -html=./artifacts/cover.out -o ./artifacts/coverage.html
+        gopherbadger -md="README.md,coverage.md" -tags 'unit' # -manualcov=95
