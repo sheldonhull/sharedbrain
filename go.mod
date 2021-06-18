@@ -1,4 +1,4 @@
-module sharedbrain
+module github.com/sheldonhull/sharedbrain
 
 go 1.13
 
