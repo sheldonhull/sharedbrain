@@ -5,13 +5,14 @@ import (
 	"log"
 
 	"github.com/sheldonhull/sharedbrain/backlinker"
+
 )
 
 const VERSION = "1.1.2"
 
-type builder struct {
-	dist bool
-}
+// type builder struct {
+// 	dist bool
+// }
 
 func main() {
 	content := flag.String("content", "", "Source directory")

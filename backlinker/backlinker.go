@@ -22,6 +22,7 @@ import (
 	"github.com/yuin/goldmark/text"
 	"github.com/yuin/goldmark/util"
 	"gopkg.in/yaml.v2"
+
 )
 
 // backlink is a link to a given markdownFile from another
@@ -216,7 +217,7 @@ func adjustFrontmatter(file *markdownFile, writer io.Writer) error {
 	plainFilename := removeExtension(file.OriginalName)
 	if file.IsDateFile {
 		_, hasTitle := meta["title"]
-			if !hasTitle {
+		if !hasTitle {
 			meta["title"] = plainFilename
 		}
 		_, hasDate := meta["date"]
@@ -244,7 +245,7 @@ func adjustFrontmatter(file *markdownFile, writer io.Writer) error {
 				continue
 			}
 			otherDate, ok := otherDateInt.(time.Time)
-			if ok == false {
+			if !ok {
 				log.Printf("[time.Parse] probable invalid date format %s", plainFilename)
 			}
 			if otherDate.After(latest) {
@@ -260,9 +261,9 @@ func adjustFrontmatter(file *markdownFile, writer io.Writer) error {
 	if err != nil {
 		return err
 	}
-	writer.Write([]byte("---\n"))
-	writer.Write(updatedMeta)
-	writer.Write([]byte("---\n"))
+	_,_ = writer.Write([]byte("---\n"))
+	_,_ = writer.Write(updatedMeta)
+	_,_ = writer.Write([]byte("---\n"))
 
 	return nil
 }
@@ -333,7 +334,7 @@ func addBacklinks(file *markdownFile, fileMap map[string]*markdownFile, writer i
 	if len(file.BackLinks) == 0 {
 		return nil
 	}
-	writer.Write([]byte(`
+	_,_ = writer.Write([]byte(`
 ## Backlinks
 
 `))
@@ -363,7 +364,7 @@ func addBacklinks(file *markdownFile, fileMap map[string]*markdownFile, writer i
 		title := backlink.OtherFile.Title
 		link := createHugoLink(backlink.OtherFile.OriginalName)
 		context := convertLinksOnLine(backlink.Context, fileMap)
-		writer.Write([]byte(fmt.Sprintf(`- [%s](%s)
+		_,_ = writer.Write([]byte(fmt.Sprintf(`- [%s](%s)
     - %s
 `, title, link, context)))
 	}

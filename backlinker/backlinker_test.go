@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+
 )
 
 func TestCreateFileMapping(t *testing.T) {
@@ -84,7 +85,9 @@ date: 2019-08-26T19:34:48-04:00
 	writer := bytes.Buffer{}
 	file.scanner = scanner
 	err := extractFrontmatter(&file, scanner)
+	require.NoError(err, "extractFrontmatter" )
 	err = adjustFrontmatter(&file, &writer)
+	require.NoError(err, "adjustFrontmatter" )
 	require.Nil(err)
 	require.Equal("", file.firstLine)
 	output := writer.String()
